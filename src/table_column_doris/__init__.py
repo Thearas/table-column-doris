@@ -3,7 +3,7 @@ import typing as t
 
 import sqlparse
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 DEFAULT_TYPE_LENGTH = {
     "char": [255],
@@ -114,7 +114,7 @@ def get_db_table_columns(sql: str) -> t.Dict[str, t.Dict[str, t.List[DDLColumn]]
 
     dbs: t.Dict[str, t.Dict[str, t.List[DDLColumn]]] = {}
     for parsed in sqlparse.parse(sql):
-        if not _is_create_table_stmt(parsed):
+        if not is_create_table_stmt(parsed):
             continue
 
         db = ""
@@ -184,7 +184,7 @@ def _extract_definitions(token_list) -> t.List[DDLColumn]:
     return definitions
 
 
-def _is_create_table_stmt(stmt) -> bool:
+def is_create_table_stmt(stmt) -> bool:
     if stmt.get_type() != "CREATE":
         return False
 
