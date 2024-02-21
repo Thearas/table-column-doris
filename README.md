@@ -1,2 +1,3 @@
-# table-columns
-Simple tools to work with create-table SQL statements.
+# table-column-doris
+
+Simple tools to work with Doris create-table SQL statements.
