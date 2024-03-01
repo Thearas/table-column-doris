@@ -3,7 +3,7 @@ import typing as t
 
 import sqlparse
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 DEFAULT_TYPE_LENGTH = {
     "char": [255],
@@ -78,7 +78,10 @@ class DDLColumn:
         if len(re.findall(r"not\s+null", col, re.IGNORECASE)) > 0:
             return col
 
-        return re.sub(r"(?i)\snull\s", " not null ", col)
+        col = re.sub(r"(?i)\sdefault\s+null", " ", col)
+        col = re.sub(r"(?i)\snull\s", " not null ", col, count=1)
+
+        return col
 
     def type_length(self) -> t.Optional[t.List[int]]:
         """Get the length of the type, like [200] in varchar(200), [2, 1] in decimal(2, 1).
@@ -195,3 +198,15 @@ def is_create_table_stmt(stmt) -> bool:
             return True
 
     return False
+
+
+def test_col_not_null():
+    cols = get_db_table_columns(
+        """
+create table t(a int not null,
+b varchar(256) null default null
+)xxxx"""
+    )[""]["t"]
+
+    assert cols[0].col_not_null == "a int not null"
+    assert cols[1].col_not_null == "b varchar(256) not null "
